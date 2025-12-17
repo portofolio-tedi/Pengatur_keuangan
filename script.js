@@ -1,75 +1,86 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-  display: flex;
-  justify-content: center;
-  padding: 20px;
+let balance=0,transactions=[],savingsGoal=0;
+
+window.onload=function(){
+if(localStorage.getItem('transactions')){
+transactions=JSON.parse(localStorage.getItem('transactions'));
+balance=parseInt(localStorage.getItem('balance'))||0;
+savingsGoal=parseInt(localStorage.getItem('savingsGoal'))||0;
+document.getElementById('balance').innerText=balance;
+document.getElementById('savingsGoal').innerText=savingsGoal;
+renderTransactions();
+}
+};
+
+function addTransaction(){
+const description=document.getElementById('description').value;
+const amount=parseInt(document.getElementById('amount').value);
+const type=document.getElementById('type').value;
+const category=document.getElementById('category').value;
+if(description==""||isNaN(amount)){alert("Isi keterangan dan jumlah dengan benar!");return;}
+const transaction={description,amount,type,category};
+transactions.push(transaction);
+updateBalance(type,amount);
+saveData();
+renderTransactions();
+clearForm();
 }
 
-.container {
-  background:white;
-  padding:20px;
-  border-radius:15px;
-  width:100%;
-  max-width:500px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+function updateBalance(type,amount){
+if(type==="income"){balance+=amount;}else{balance-=amount;}
+document.getElementById('balance').innerText=balance;
+updateSummary();
 }
 
-h1,h2,h3{text-align:center;margin-bottom:15px;}
-h1{color:#333;}
-
-.balance-card, .summary-card {
-  background:#f0f4f8;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:20px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+function renderTransactions(){
+const list=document.getElementById('transactions');
+list.innerHTML="";
+transactions.forEach((t,index)=>{
+const li=document.createElement('li');
+li.innerText=`${t.description}: Rp ${t.amount} (${t.category})`;
+li.className=t.type+' category-'+t.category;
+const delBtn=document.createElement('button');
+delBtn.innerText="Hapus";
+delBtn.className="delete-btn";
+delBtn.onclick=()=>deleteTransaction(index);
+li.appendChild(delBtn);
+list.appendChild(li);
+});
+updateSummary();
 }
 
-.form, .savings {
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  margin-bottom:20px;
+function clearForm(){document.getElementById('description').value="";document.getElementById('amount').value="";}
+
+function setSavingsGoal(){
+const goal=parseInt(document.getElementById('goalAmount').value);
+if(isNaN(goal)||goal<=0){alert("Masukkan jumlah target tabungan yang valid!");return;}
+savingsGoal=goal;
+document.getElementById('savingsGoal').innerText=savingsGoal;
+localStorage.setItem('savingsGoal',savingsGoal);
+document.getElementById('goalAmount').value="";
 }
 
-input, select, button {
-  padding:10px;
-  font-size:16px;
-  border-radius:8px;
-  border:1px solid #ccc;
+function deleteTransaction(index){
+const t=transactions[index];
+if(t.type==="income"){balance-=t.amount;}else{balance+=t.amount;}
+transactions.splice(index,1);
+saveData();
+document.getElementById('balance').innerText=balance;
+renderTransactions();
 }
 
-button {
-  background:#4caf50;
-  color:white;
-  border:none;
-  cursor:pointer;
-  transition:0.3s;
+function saveData(){
+localStorage.setItem('transactions',JSON.stringify(transactions));
+localStorage.setItem('balance',balance);
 }
 
-button:hover {background:#45a049;}
-
-ul{list-style:none;padding:0;margin:0;}
-li {
-  padding:12px;
-  border-radius:8px;
-  margin-bottom:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  transition:0.3s;
+function updateSummary(){
+let totalIncome=0,totalExpense=0,totalSaving=0;
+transactions.forEach(t=>{
+if(t.type==="income") totalIncome+=t.amount;
+if(t.type==="expense") totalExpense+=t.amount;
+if(t.category==="saving") totalSaving+=t.amount;
+});
+document.getElementById('totalIncome').innerText=totalIncome;
+document.getElementById('totalExpense').innerText=totalExpense;
+document.getElementById('totalSaving').innerText=totalSaving;
 }
-
-.income{background:#d4edda;color:#155724;}
-.expense{background:#f8d7da;color:#721c24;}
-.category-food{border-left:5px solid #ffa726;}
-.category-transport{border-left:5px solid #42a5f5;}
-.category-entertainment{border-left:5px solid #ec407a;}
-.category-saving{border-left:5px solid #66bb6a;}
-
-.delete-btn{
-  background:#e53935;color:white;padding:5px 10px;border:none;border-radius:5px;cursor:pointer;
-  transition:0.3s;
-}
-.delete-btn:hover{background:#c62828;}
