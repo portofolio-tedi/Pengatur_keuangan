@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengatur Keuangan Harian</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+<h1>Pengatur Keuangan Harian</h1>
+
+<div class="balance">
+<h2>Saldo: Rp <span id="balance">0</span></h2>
+<h3>Target Menabung: Rp <span id="savingsGoal">0</span></h3>
+</div>
+
+<div class="form">
+<input type="text" id="description" placeholder="Keterangan">
+<input type="number" id="amount" placeholder="Jumlah Rp">
+<select id="type">
+<option value="income">Pemasukan</option>
+<option value="expense">Pengeluaran</option>
+</select>
+<select id="category">
+<option value="general">Umum</option>
+<option value="food">Makanan</option>
+<option value="transport">Transport</option>
+<option value="entertainment">Hiburan</option>
+<option value="saving">Tabungan</option>
+</select>
+<button onclick="addTransaction()">Tambah</button>
+</div>
+
+<div class="savings">
+<input type="number" id="goalAmount" placeholder="Target Menabung Rp">
+<button onclick="setSavingsGoal()">Set Target</button>
+</div>
+
+<h3>Riwayat Transaksi</h3>
+<ul id="transactions"></ul>
+
+<div class="summary">
+<h3>Ringkasan</h3>
+<div>Pemasukan: Rp <span id="totalIncome">0</span></div>
+<div>Pengeluaran: Rp <span id="totalExpense">0</span></div>
+<div>Tabungan: Rp <span id="totalSaving">0</span></div>
+</div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
